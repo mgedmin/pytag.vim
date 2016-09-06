@@ -36,7 +36,7 @@ endif
 execute g:smart_tag_python 'import smart_tag'
 
 fun! Tag(name)
-    execute g:smart_tag_python smart_tag.jump(vim.eval('a:name'))
+    execute g:smart_tag_python "smart_tag.jump(vim.eval('a:name'))"
 endf
 
 command! -nargs=1 -complete=tag -bar Tag :call Tag(<f-args>)
