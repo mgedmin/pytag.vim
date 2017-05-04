@@ -11,12 +11,13 @@ Usage::
   :Tag module.class           -- jump to the right class
   :Tag package.module.class   -- jump to the right class
   :Tag package.module         -- jump to the right file
+  :Tag package                -- jump to the right file
 
 You still need a tags file.   What ``:Tag`` does is filter the tags according
 to containing class/filename.
 
-If you want to jump to Python modules, you'll need to generate your tags file
-with the ctags option ``--extra=+f``.
+If you want to jump to Python modules and packages, you'll need to generate
+your tags file with the ctags option ``--extra=+f``.
 
 
 Installation

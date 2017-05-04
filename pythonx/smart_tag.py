@@ -1,3 +1,13 @@
+"""
+" HACK to make this file source'able by vim as well as importable by Python:
+if has('python3')
+  py3 from importlib import reload; reload(smart_tag)
+else
+  py reload(smart_tag)
+endif
+finish
+"""
+import os
 import vim
 
 
@@ -37,23 +47,23 @@ class SmartTagFinder(object):
     @staticmethod
     def filter_file(tags, filename):
         """Return tags that are in files/directories with a certain name."""
-        # XXX: this can match a substring of a filename, which would be a bug
-        # what we want to match is directory names and filename-with-no-extension
-        return [t for t in tags if filename in t.get("filename")]
+        return [t for t in tags if os.path.splitext(t.get("filename"))[0].endswith(filename)]
 
     def find_best_tag(self, query):
         bits = query.split('.')
         name = bits.pop()
         possibilities = [
-            # [[package.]module.]name
+            # [[package.]module.]name -> expect name in package/module.py outside class
             (bits, None, name),
         ]
         if bits:
-            # [[package.]module.]class.name
+            # [[package.]module.]class.name -> expect name in package/module.py, in a class
             possibilities.append((bits[:-1], bits[-1], name))
         possibilities += [
-            # [package.]module
-            (bits, None, name + '.py'),
+            # [package] -> expect __init__.py in package/name/__init__.py
+            (bits + [name, '__init__'], None, '__init__.py'),
+            # [package.]module -> expect name.py in package/name.py
+            (bits + [name], None, name + '.py'),
         ]
 
         for filename_bits, class_, name in possibilities:
@@ -75,7 +85,7 @@ class SmartTagFinder(object):
             if filename_bits:
                 filename = '/'.join(filename_bits)
                 tags = self.filter_file(tags, filename)
-                self.debug("%d tags matched filename substring %s" % (len(tags), filename))
+                self.debug("%d tags matched filename %s" % (len(tags), filename))
             if tags:
                 tag = tags[0]
                 index = original.index(tag)
