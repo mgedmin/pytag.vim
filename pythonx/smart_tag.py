@@ -49,6 +49,19 @@ class SmartTagFinder(object):
         """Return tags that are in files/directories with a certain name."""
         return [t for t in tags if os.path.splitext(t.get("filename"))[0].endswith(filename)]
 
+    def priority(self, tag):
+        """Compute the priority of a tag (lower is preferred)."""
+        filename = tag.get('filename') or ''
+        # apply some heuristics; these should be made configurable!
+        if 'test' in filename or 'fixture' in filename:
+            self.debug('%s looks like a test file, deprioritizing the tag' % filename)
+            return 10
+        return 0
+
+    def prioritize(self, tags):
+        """Reorder tags into priority order."""
+        return sorted(tags, key=self.priority)
+
     def find_best_tag(self, query):
         bits = query.split('.')
         name = bits.pop()
@@ -87,6 +100,7 @@ class SmartTagFinder(object):
                 tags = self.filter_file(tags, filename)
                 self.debug("%d tags matched filename %s" % (len(tags), filename))
             if tags:
+                tags = self.prioritize(tags)
                 tag = tags[0]
                 index = original.index(tag)
                 return (tag, name, index)
@@ -132,7 +146,7 @@ class SmartTagFinder(object):
             # So here's a workaround: first find the right class, then find
             # the right method in that class.
             self.debug("Applying Python class method workaround")
-            self.command("keepjumps 0;/^class %s\>/;%s" % (tag['class'], tagcmd))
+            self.command(r"keepjumps 0;/^class %s\>/;%s" % (tag['class'], tagcmd))
         else:
             self.command("keepjumps 0;%s" % tagcmd)
 
