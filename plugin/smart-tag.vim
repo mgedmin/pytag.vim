@@ -1,8 +1,8 @@
 "
 " File: smart-tag.vim
 " Author: Marius Gedminas <marius@gedmin.as>
-" Version: 1.1
-" Last Modified: 2023-01-24
+" Version: 1.2
+" Last Modified: 2024-11-09
 "
 " Smarter :tag
 "

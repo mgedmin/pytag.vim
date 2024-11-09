@@ -106,16 +106,25 @@ class SmartTagFinder(object):
                 return (tag, name, index)
         return None, None, None
 
+    def already_editing_file(self, filename):
+        if not vim.current.buffer.name:
+            return False
+        if not os.path.exists(vim.current.buffer.name):
+            return False
+        return os.path.samefile(vim.current.buffer.name, filename)
+
     def jump_to_tag(self, tag, name, index):
         if tag is None or name is None or index is None:
             return
-        self.command("%dtag %s" % (index + 1, name))
-        # but I can't rely on it because the order of tags in :[count]tag
+        # I can't rely on just :tag because the order of tags in :[count]tag
         # doesn't match the order of tags returned by taglist() due to
         # :h tag-priority sorting!
         # Doing both now because the :tag pushes the name onto the tag stack,
-        # and then my :e will make sure I went to the right location
-        if vim.current.buffer.name != tag['filename']:
+        # and then my :e will make sure I went to the right location.
+        self.command("%dtag %s" % (index + 1, name))
+        if not self.already_editing_file(tag['filename']):
+            # trying to :e the current file will fail if it's modified,
+            # even if you have hidden set
             self.command("keepjumps e %s" % tag["filename"])
 
         tagcmd = tag["cmd"]
