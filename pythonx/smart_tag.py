@@ -42,7 +42,7 @@ class SmartTagFinder(object):
     @staticmethod
     def filter_toplevel(tags):
         """Return tags that belong to top-level names."""
-        return [t for t in tags if not t.get("class")]
+        return [t for t in tags if not t.get("class") and t.get('kind') != 'x']
 
     @staticmethod
     def filter_file(tags, filename):
