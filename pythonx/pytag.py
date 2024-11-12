@@ -1,12 +1,3 @@
-"""
-" HACK to make this file source'able by vim as well as importable by Python:
-if has('python3')
-  py3 from importlib import reload; reload(smart_tag)
-else
-  py reload(smart_tag)
-endif
-finish
-"""
 import os
 import vim
 
@@ -47,14 +38,20 @@ class SmartTagFinder(object):
     @staticmethod
     def filter_file(tags, filename):
         """Return tags that are in files/directories with a certain name."""
-        return [t for t in tags if os.path.splitext(t.get("filename"))[0].endswith(filename)]
+        return [
+            t
+            for t in tags
+            if os.path.splitext(t.get("filename"))[0].endswith(filename)
+        ]
 
     def priority(self, tag):
         """Compute the priority of a tag (lower is preferred)."""
         filename = tag.get('filename') or ''
         # apply some heuristics; these should be made configurable!
         if 'test' in filename or 'fixture' in filename:
-            self.debug('%s looks like a test file, deprioritizing the tag' % filename)
+            self.debug(
+                '%s looks like a test file, deprioritizing the tag' % filename
+            )
             return 10
         return 0
 
@@ -66,11 +63,13 @@ class SmartTagFinder(object):
         bits = query.split('.')
         name = bits.pop()
         possibilities = [
-            # [[package.]module.]name -> expect name in package/module.py outside class
+            # [[package.]module.]name -> expect name in package/module.py
+            # outside class
             (bits, None, name),
         ]
         if bits:
-            # [[package.]module.]class.name -> expect name in package/module.py, in a class
+            # [[package.]module.]class.name -> expect name in package/module.py
+            # in a class
             possibilities.append((bits[:-1], bits[-1], name))
         possibilities += [
             # [package] -> expect __init__.py in package/name/__init__.py
@@ -98,7 +97,9 @@ class SmartTagFinder(object):
             if filename_bits:
                 filename = '/'.join(filename_bits)
                 tags = self.filter_file(tags, filename)
-                self.debug("%d tags matched filename %s" % (len(tags), filename))
+                self.debug(
+                    "%d tags matched filename %s" % (len(tags), filename)
+                )
             if tags:
                 tags = self.prioritize(tags)
                 tag = tags[0]
@@ -129,7 +130,8 @@ class SmartTagFinder(object):
 
         tagcmd = tag["cmd"]
         if tagcmd.startswith('/^') and tagcmd.endswith('$/'):
-            # tags files contain stuff like /^def foo(**kwargs):$/ which needs to be verynomagick'ed
+            # tags files contain stuff like /^def foo(**kwargs):$/
+            # which needs to be verynomagick'ed
             tagcmd = r'/^\V%s\$/' % tagcmd[2:-2].replace('\\', '\\\\')
 
         if tag.get('class') and tag['filename'].endswith('.py'):
@@ -155,7 +157,9 @@ class SmartTagFinder(object):
             # So here's a workaround: first find the right class, then find
             # the right method in that class.
             self.debug("Applying Python class method workaround")
-            self.command(r"keepjumps 0;/^class %s\>/;%s" % (tag['class'], tagcmd))
+            self.command(
+                r"keepjumps 0;/^class %s\>/;%s" % (tag['class'], tagcmd)
+            )
         else:
             self.command("keepjumps 0;%s" % tagcmd)
 

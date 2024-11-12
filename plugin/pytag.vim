@@ -1,8 +1,8 @@
 "
-" File: smart-tag.vim
+" File: pytag.vim
 " Author: Marius Gedminas <marius@gedmin.as>
-" Version: 1.3
-" Last Modified: 2024-11-11
+" Version: 2.0
+" Last Modified: 2024-11-12
 "
 " Smarter :tag
 "
@@ -22,23 +22,13 @@
 " Doesn't need a tags file with --extra=+q (which stopped working for Python
 " anyway in some exuberant ctags version).
 "
-" Does need a tags file with --extra=+f for jumping to modules
+" Need a tags file with --extra=+f for jumping to modules.
 "
 
-if !exists("g:smart_tag_python")
-    if has("python3")
-        let g:smart_tag_python = "python3"
-    elseif has("python")
-        let g:smart_tag_python = "python"
-    else
-        finish
-    endif
-endif
+pyx import pytag
 
-execute g:smart_tag_python 'import smart_tag'
-
-fun! Tag(name)
-    execute g:smart_tag_python "smart_tag.jump(vim.eval('a:name'))"
+fun! s:Tag(name)
+    pyx pytag.jump(vim.eval('a:name'))
 endf
 
-command! -nargs=1 -complete=tag -bar Tag :call Tag(<f-args>)
+command! -nargs=? -complete=tag -bar  Tag  call s:Tag(<q-args>)

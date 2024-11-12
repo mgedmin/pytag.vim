@@ -23,18 +23,16 @@ your tags file with the ctags option ``--extra=+f``.
 Installation
 ------------
 
-You need Vim with `+python` or `+python3`.
+You need Vim with Python support.
 
-I recommend a plugin manager like Vundle_ or Pathogen_.  E.g. with Vundle
-you can ::
+I recommend a plugin manager like vim-plug_ ::
 
-  :PluginInstall mgedmin/pytag.vim
+    Plug 'mgedmin/pytag.vim'
 
-Manual installation:
+You may also want to consider the following mapping in
+~/.vim/ftplugin/python.vim::
 
-- copy plugin/smart-tag.vim to ~/.vim/plugin/
-- copy pythonx/smart_tag.py to ~/.vim/pythonx/
+    " Smarter Ctrl-]
+    nnoremap <buffer> <expr> <C-]> pytag#tag_jump_mapping()
 
-
-.. _Vundle: https://github.com/gmarik/vundle
-.. _Pathogen: https://github.com/tpope/vim-pathogen
+.. _vim-plug: https://github.com/junegunn/vim-plug
