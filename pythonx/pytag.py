@@ -114,7 +114,7 @@ class SmartTagFinder(object):
             return False
         return os.path.samefile(vim.current.buffer.name, filename)
 
-    def jump_to_tag(self, tag, name, index):
+    def jump_to_tag(self, tag, name, index, use_tagstack):
         if tag is None or name is None or index is None:
             return
         # I can't rely on just :tag because the order of tags in :[count]tag
@@ -122,7 +122,10 @@ class SmartTagFinder(object):
         # :h tag-priority sorting!
         # Doing both now because the :tag pushes the name onto the tag stack,
         # and then my :e will make sure I went to the right location.
-        self.command("%dtag %s" % (index + 1, name))
+        if use_tagstack:
+            self.command("tag")
+        else:
+            self.command("%dtag %s" % (index + 1, name))
         if not self.already_editing_file(tag['filename']):
             # trying to :e the current file will fail if it's modified,
             # even if you have hidden set
@@ -166,16 +169,28 @@ class SmartTagFinder(object):
 
 def jump(query):
     verbose = int(vim.eval('&verbose'))
+    finder = SmartTagFinder(verbose=verbose)
+    use_tagstack = False
 
     if not query:
-        # XXX: it'd be nice to take the topmost name from the tag stack
-        return
+        tagstack = vim.bindeval('gettagstack()')
+        try:
+            idx = tagstack['curidx'] - 1
+            if idx >= len(tagstack['items']):
+                # :tag would show an E556: At the top of the tag stack error
+                # and then jump to the topmost tag again
+                idx -= 1
+            query = tagstack['items'][idx]['tagname'].decode()
+            use_tagstack = True
+            finder.debug('Jumping to %s from the tag stack' % query)
+        except KeyError:
+            print("Tag stack empty")
+            return
 
-    finder = SmartTagFinder(verbose=verbose)
     tag, name, index = finder.find_best_tag(query)
 
     if not tag:
         print("Couldn't find %s" % query)
         return
 
-    finder.jump_to_tag(tag, name, index)
+    finder.jump_to_tag(tag, name, index, use_tagstack)
