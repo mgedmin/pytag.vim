@@ -48,6 +48,11 @@ class SmartTagFinder(object):
         """Compute the priority of a tag (lower is preferred)."""
         filename = tag.get('filename') or ''
         # apply some heuristics; these should be made configurable!
+        if 'site-packages' in filename:
+            self.debug(
+                '%s looks like a dependency, deprioritizing the tag' % filename
+            )
+            return 20
         if 'test' in filename or 'fixture' in filename:
             self.debug(
                 '%s looks like a test file, deprioritizing the tag' % filename
