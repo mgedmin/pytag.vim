@@ -1,3 +1,8 @@
+function pytag#jump(name)
+  pyx import pytag
+  pyx pytag.jump(vim.eval('a:name'))
+endf
+
 " Intended to use as :nnoremap <expr> <C-]> pytag#tag_jump_mapping()
 function pytag#tag_jump_mapping()
   let line = getline(line("."))

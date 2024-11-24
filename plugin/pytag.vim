@@ -25,10 +25,4 @@
 " Need a tags file with --extra=+f for jumping to modules.
 "
 
-pyx import pytag
-
-fun! s:Tag(name)
-    pyx pytag.jump(vim.eval('a:name'))
-endf
-
-command! -nargs=? -complete=tag -bar  Tag  call s:Tag(<q-args>)
+command! -nargs=? -complete=tag -bar  Tag  call pytag#jump(<q-args>)
