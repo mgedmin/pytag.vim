@@ -1,8 +1,8 @@
 "
 " File: pytag.vim
 " Author: Marius Gedminas <marius@gedmin.as>
-" Version: 2.0
-" Last Modified: 2024-11-12
+" Version: 2.1
+" Last Modified: 2024-11-24
 "
 " Smarter :tag
 "
