@@ -3,21 +3,8 @@ function pytag#tag_jump_mapping()
   let line = getline(line("."))
   let [modname, startpos, endpos] = matchstrpos(line, '^\(from\|import\)\s\+\zs[a-zA-Z0-9_.]\+')
   if col(".") > startpos && col(".") <= endpos
-    if exists(":Tag")
-      " :Tag is provided by https://github.com/mgedmin/pytag.vim
-      return ":Tag " . modname . "\<CR>"
-    else
-      " NB: jumping to module.py requires that you build your tags files with
-      " ctags --extra=+f
-      let filename = substitute(modname, '^.*[.]', '', '') . '.py'
-      return ":tag " . filename . "\<CR>"
-    endif
+    return ":Tag " . modname . "\<CR>"
   else
-    if exists(":Tag")
-      " :Tag is provided by https://github.com/mgedmin/pytag.vim
-      return ":Tag " . expand("<cword>") . "\<CR>"
-    else
-      return "\<C-]>"
-    endif
+    return ":Tag " . expand("<cword>") . "\<CR>"
   endif
 endf
